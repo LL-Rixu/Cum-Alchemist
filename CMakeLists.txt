@@ -6,9 +6,23 @@ set(CMAKE_CXX_STANDARD			 23)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS		YES)
 
+# Add as submodules
 find_package(binary_io REQUIRED CONFIG)
 find_package(spdlog REQUIRED CONFIG)
-find_package(CommonLibSSE REQUIRED CONFIG)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(SKYRIM_SUPPORT_AE ON CACHE BOOL "" FORCE)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+set(CMAKE_CXX_FLAGS "/EHsc /MP")
+
+IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /permissive- /Zc:preprocessor")
+ELSEIF(CMAKE_BUILD_TYPE STREQUAL "Release")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ox /GF /GL")
+	set(CMAKE_SHARED_LINKER_FLAGS "/LTCG")
+ENDIF()
+
+add_subdirectory(extern/CommonLibSSE EXCLUDE_FROM_ALL)
 
 add_library(${PROJECT_NAME} SHARED 	"source/entry.cpp" 
 									"source/CumAlchemist.cpp" 
@@ -41,16 +55,10 @@ target_link_libraries(
 		spdlog::spdlog
 	)
 
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-set(CMAKE_CXX_FLAGS "/EHsc /MP -DSKYRIM_SUPPORT_AE")
-
-IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /permissive- /Zc:preprocessor")
-ELSEIF(CMAKE_BUILD_TYPE STREQUAL "Release")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ox /GF /GL")
-	set(CMAKE_SHARED_LINKER_FLAGS "/LTCG")
-ENDIF()
-
-message(CMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS}")
-
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/Data/SKSE/Plugins)
+
+install(CODE "file(ARCHIVE_CREATE \
+    OUTPUT \"${CMAKE_CURRENT_SOURCE_DIR}/Cum Alchemist.7z\" \
+    PATHS \"${CMAKE_CURRENT_SOURCE_DIR}/Data\" \
+    FORMAT \"7zip\" \
+)")
