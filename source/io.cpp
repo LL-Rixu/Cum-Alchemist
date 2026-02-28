@@ -7,13 +7,24 @@ std::string Io::directory = "Data\\CmAl\\";
 Io::Io()  { io = this; }
 Io::~Io() { io = nullptr; }
 
+std::string Io::GetPath(void* filename)
+{
+    std::string path(directory);
+    path.append(reinterpret_cast<char*>(filename));
+
+    size_t index = path.find_last_of('.');
+    if(index != std::string::npos) { path.erase(index, path.size() - index); }
+
+    path += ".potions";
+
+    return path;
+}
+
 void Io::OnLoad(void* data, size_t size)
 {
     if(!io) { return; }
 
-    std::string path(directory);
-    path.append(reinterpret_cast<char*>(data), size - 4);
-    path += ".potions";
+    std::string path = GetPath(data);
 
     FILE* fd = fopen(path.c_str(), "rb");
     if(fd == nullptr) { return; }
@@ -32,9 +43,7 @@ void Io::OnSave(void* data, size_t size)
 {
     if(!io) { return; }
 
-    std::string path(directory);
-    path.append(reinterpret_cast<char*>(data), size);
-    path += ".potions";
+    std::string path = GetPath(data);
 
     std::vector<uint8_t> bytes = io->EventOnSave();
 

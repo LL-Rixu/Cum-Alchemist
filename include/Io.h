@@ -7,9 +7,11 @@ class Io
 {
 	static Io* io;
     static std::string directory;
+
+	static std::string GetPath(void*);
 public:
-	static void OnLoad(void* data, size_t size);
-	static void OnSave(void* data, size_t size);
+	static void OnLoad(void*, size_t);
+	static void OnSave(void*, size_t);
 
     virtual void EventOnLoad(std::vector<uint8_t>&) = 0;
     virtual std::vector<uint8_t> EventOnSave() = 0;
