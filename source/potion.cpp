@@ -32,7 +32,7 @@ Potion::Potion(): factory(RE::IFormFactory::GetConcreteFormFactoryByType<RE::Alc
     GetKeyword(Fortify::Health);
     GetKeyword(Fortify::HeavyArmor);
     GetKeyword(Fortify::Illusion);
-    GetKeyword(Fortify::LigthArmor);
+    GetKeyword(Fortify::LightArmor);
     GetKeyword(Fortify::Lockpicking);
     GetKeyword(Fortify::Magicka);
     GetKeyword(Fortify::MagickaRate);
@@ -71,44 +71,123 @@ Potion::Potion(): factory(RE::IFormFactory::GetConcreteFormFactoryByType<RE::Alc
     for(RE::AlchemyItem* potion : datahandler->GetFormArray<RE::AlchemyItem>()) { cache[potion] = potion; }
 }
 
-RE::BSFixedString Potion::GetName(std::map<RE::FormID, RE::Effect*>& effects)
+static _forceinline const char* GetScale(const std::map<RE::FormID, RE::Effect*>& effects)
 {
-    char buffer[25];
+    const char* scales[] = { "Weak", "Mediocre", "Moderate", "Strong", "Mighty" };
 
-    RE::FormID m_id;
-    float m_mag = -INFINITY;
-    int path = 1;
-    for(auto& [id, effect] : effects) 
-    { 
-        path += effect->baseEffect->HasKeyword(kwpotion[Potion::Beneficial]) ? 5 : -3; 
+    float magnitude = 0.f;
+    for(auto& [id, effect] : effects)
+    {
+        magnitude += effect->effectItem.magnitude * effect->effectItem.magnitude;
+    }
+    const float average = sqrtf(magnitude) / static_cast<float>(effects.size());
+    const int i = static_cast<const int>(1.52f * std::logf(0.27f * average + 1.f));
+    return scales[std::clamp(i, 0, 4)];
+}
 
-        if(m_mag <= effect->effectItem.magnitude)
-        { 
-            m_id = id;
-            m_mag = effect->effectItem.magnitude; 
-        }
+/* Implement smarter type naming function */
+static _forceinline const char* GetType(const std::map<RE::FormID, RE::Effect*>& effects, const std::array<RE::BGSKeyword*, 43>& kwpotion)
+{
+    const char* types[] = 
+    {
+        "Beneficial",
+        "Harmful",
+
+        // Fortify
+        "Alchemy",
+        "Alteration",
+        "Block",
+        "Carry weight",
+        "Conjuration",
+        "Destruction",
+        "Enchanting",
+        "Regeneration", // HealRate,
+        "Health",
+        "Heavy armor",
+        "Illusion",
+        "Ligth armor",
+        "Lockpicking",
+        "Magicka",
+        "Lucidity", // MagickaRate
+        "Archery",  // Marksman
+        "Mass",
+        "One handed",
+        "Pickpocket",
+        "Restoration",
+        "Smithing",
+        "Sneak",
+        "Speechcraft",
+        "Stamina",
+        "Vigor", // StaminaRate
+        "Two handed",
+
+        // Damage
+        "Health",
+        "Magicka",
+        "Stamina",
+
+        // Resist
+        "Fire",
+        "Frost",
+        "Magic",
+        "Poison",
+        "Shock",
+
+        // Restore
+        "Healing",
+        "Magic",
+        "Stamina",
+
+        // Weakness
+        "Fire",
+        "Frost",
+        "Magic",
+        "Shock",
+    };
+
+    std::vector<std::pair<int, float>> match;
+
+    std::unordered_map<RE::FormID, int> map;
+    for(size_t i = 0; i < kwpotion.size(); ++i) 
+    {
+        if(!kwpotion[i]){ continue; }
+        map[kwpotion[i]->formID] = i; 
     }
 
-    const char* scale = "Weak";
-    if(m_mag > 10)  { scale = "Mediocre"; }
-    if(m_mag > 25)  { scale = "Moderate"; }
-    if(m_mag > 50)  { scale = "Strong"; }
-    if(m_mag > 100) { scale = "Mighty"; }
+    for(auto& [id, effect] : effects)
+    {
+        auto keywords = effect->baseEffect->keywords;
+        for(size_t i = 0; i < effect->baseEffect->numKeywords; ++i)
+        {
+            if(map.contains(keywords[i]->formID))
+            {
+                match.push_back({map[keywords[i]->formID], effect->effectItem.magnitude});
+            }
+        }
+    }
+    
+    if(match.empty()) { return ""; }
 
-    /* add rest of the potion keywords */
-    const char* type = "Mixed";
-    if(effects[m_id]->baseEffect->HasKeyword(kwpotion[Restore::Health]))       { type = "Healing"; } 
-    else if(effects[m_id]->baseEffect->HasKeyword(kwpotion[Restore::Stamina])) { type = "Stamina"; }
-    else if(effects[m_id]->baseEffect->HasKeyword(kwpotion[Restore::Magicka])) { type = "Magicka"; }
+    std::sort(match.begin(), match.end(), [](std::pair<int, float>& a, std::pair<int, float>& b) { return a.second > b.second; });
 
-    const char* end = (path >= 0) ? "Potion" : "Poison";
+    return types[std::clamp(match[0].first, 0, (int)(sizeof(types) / sizeof(*types)) - 1)];
+}
 
-    snprintf(buffer, sizeof(buffer), "%s %s %s", scale, type, end);
+static _forceinline const char* GetEnd(const std::map<RE::FormID, RE::Effect*>& effects, const RE::BGSKeyword* keyword)
+{
+    int path = 1;
+    for(auto& [id, effect] : effects) { path += effect->baseEffect->HasKeyword(keyword) ? 5 : -3; }
+    return (path >= 0) ? "potion" : "poison";
+}
 
+RE::BSFixedString Potion::GetName(const std::map<RE::FormID, RE::Effect*>& effects) const
+{
+    char buffer[32];
+    snprintf(buffer, sizeof(buffer), "%s %s %s", GetScale(effects), GetType(effects, kwpotion), GetEnd(effects, kwpotion[Beneficial]));
     return buffer;
 }
 
-float Potion::GetWeight(std::map<RE::FormID, RE::Effect*>& effects)
+float Potion::GetWeight(const std::map<RE::FormID, RE::Effect*>& effects) const
 {
     float weigth = 4.f;
 
@@ -117,7 +196,7 @@ float Potion::GetWeight(std::map<RE::FormID, RE::Effect*>& effects)
     return log2f(weigth) - 2.f;
 }
 
-RE::AlchemyItem::AlchemyFlag Potion::GetFlags(std::map<RE::FormID, RE::Effect*>& effects)
+RE::AlchemyItem::AlchemyFlag Potion::GetFlags(const std::map<RE::FormID, RE::Effect*>& effects) const
 {
     int path = 1;
     for(auto& [id, effect] : effects) { path += effect->baseEffect->HasKeyword(kwpotion[Beneficial]) ? 5 : -3; }
@@ -125,7 +204,7 @@ RE::AlchemyItem::AlchemyFlag Potion::GetFlags(std::map<RE::FormID, RE::Effect*>&
     return (path >= 0) ? RE::AlchemyItem::AlchemyFlag::kMedicine : RE::AlchemyItem::AlchemyFlag::kPoison;
 }
 
-RE::TESFileArray* Potion::SetFile()
+RE::TESFileArray* Potion::SetFile() const
 {
     struct Array { RE::TESFile** _data{ nullptr }; uint32_t _size{ 0 }; }* array = reinterpret_cast<Array*>(std::calloc(sizeof(Array) + sizeof(RE::TESFile*), 1));
 

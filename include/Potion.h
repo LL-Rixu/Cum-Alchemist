@@ -7,10 +7,11 @@ class Potion
 {
     RE::TESDataHandler* datahandler;
     RE::ConcreteFormFactory<RE::AlchemyItem, RE::FormType::AlchemyItem>* factory;
-    RE::BSFixedString GetName(std::map<RE::FormID, RE::Effect*>&);
-    float GetWeight(std::map<RE::FormID, RE::Effect*>&);
-    RE::AlchemyItem::AlchemyFlag GetFlags(std::map<RE::FormID, RE::Effect*>&);
-    RE::TESFileArray* SetFile();
+
+    RE::BSFixedString GetName(const std::map<RE::FormID, RE::Effect*>&) const;
+    float GetWeight(const std::map<RE::FormID, RE::Effect*>&) const;
+    RE::AlchemyItem::AlchemyFlag GetFlags(const std::map<RE::FormID, RE::Effect*>&) const;
+    RE::TESFileArray* SetFile() const;
 public:
     const RE::TESFile* esp;
     std::unordered_map<Key<RE::AlchemyItem*>, RE::AlchemyItem*> cache;
@@ -32,7 +33,7 @@ public:
             Health = 10,
             HeavyArmor = 11,
             Illusion = 12,
-            LigthArmor = 13,
+            LightArmor = 13,
             Lockpicking = 14,
             Magicka = 15,
             MagickaRate = 16,
