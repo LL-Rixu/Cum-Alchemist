@@ -26,7 +26,7 @@ void Io::OnLoad(void* data, size_t size)
 
     std::string path = GetPath(data);
     FILE* fd = fopen(path.c_str(), "rb");
-    if(fd) { return; }
+    if(!fd) { return; }
 
     std::vector<uint8_t> bytes;
     fseek(fd, 0, SEEK_END);
