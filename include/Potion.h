@@ -15,7 +15,7 @@ public:
     const RE::TESFile* esp;
     std::unordered_map<Key<RE::AlchemyItem*>, RE::AlchemyItem*> cache;
     std::vector<RE::AlchemyItem*> potions;
-    enum { Beneficial = 0, Harmful = 1, Tracking = 43 };
+    enum { Beneficial = 0, Harmful = 1 };
 
     struct Fortify
     {
@@ -54,7 +54,7 @@ public:
     struct Restore { enum{ Health = 36, Magicka = 37, Stamina = 38 }; };
     struct Weakness { enum { Fire = 39, Frost = 40, Magic = 41, Shock = 42 }; };
 
-    std::array<RE::BGSKeyword*, 44> kwpotion;
+    std::array<RE::BGSKeyword*, 43> kwpotion;
 
     Potion();
     ~Potion() = default;

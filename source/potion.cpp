@@ -67,8 +67,6 @@ Potion::Potion(): factory(RE::IFormFactory::GetConcreteFormFactoryByType<RE::Alc
     GetKeyword(Resist::Poison);
     GetKeyword(Resist::Shock);
 
-    kwpotion[Tracking]   = RE::TESForm::LookupByEditorID<RE::BGSKeyword>("CmAl_Tracking");
-
     datahandler = RE::TESDataHandler::GetSingleton();
     for(RE::AlchemyItem* potion : datahandler->GetFormArray<RE::AlchemyItem>()) { cache[potion] = potion; }
 }
@@ -149,7 +147,6 @@ RE::AlchemyItem* Potion::GetPotion(std::map<RE::FormID, RE::Effect*>& effects, R
     potion->fullName = GetName(effects);
     potion->weight = GetWeight(effects);
     potion->data.flags.set(GetFlags(effects));
-    potion->AddKeyword(kwpotion[Tracking]);
 
     for(auto& [_id, effect] : effects)
     {
