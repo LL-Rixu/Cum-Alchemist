@@ -129,7 +129,7 @@ RE::AlchemyItem::AlchemyFlag Potion::GetFlags(std::map<RE::FormID, RE::Effect*>&
 
 RE::TESFileArray* Potion::SetFile()
 {
-    struct Array { RE::TESFile** _data{ nullptr }; uint32_t _size{ 0 }; }* array = reinterpret_cast<Array*>(calloc(sizeof(Array) + sizeof(RE::TESFile*), 1));
+    struct Array { RE::TESFile** _data{ nullptr }; uint32_t _size{ 0 }; }* array = reinterpret_cast<Array*>(std::calloc(sizeof(Array) + sizeof(RE::TESFile*), 1));
 
     array->_size = 1;
     array->_data = reinterpret_cast<RE::TESFile**>(&array[1]);
@@ -156,7 +156,7 @@ RE::AlchemyItem* Potion::GetPotion(std::map<RE::FormID, RE::Effect*>& effects, R
         potion->effects.push_back(effect);    
     }
 
-    potion->sourceFiles.array = SetFile(); // Leaks memory
+    potion->sourceFiles.array = SetFile();
     datahandler->GetFormArray<RE::AlchemyItem>().push_back(potion);
     RE::TESForm::GetAllForms().first->emplace(id, potion);
 
@@ -174,6 +174,8 @@ void Potion::ResetPotion()
         auto iterator = std::find(array.begin(), array.end(), potion);
         array.erase(iterator);
         RE::TESForm::GetAllForms().first->erase(potion->formID);
+        std::free(potion->sourceFiles.array);
+        potion->sourceFiles.array = nullptr;
         potion->SetDelete(true); // Setup proper RE::AlchemyItem culling
     }
 
