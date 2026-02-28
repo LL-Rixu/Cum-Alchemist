@@ -16,7 +16,7 @@ SKSEPluginVersion = std::invoke([]()
 	version.PluginVersion(REL::Version(0, 0, 1));
 	version.PluginName("CumAlchemist");
 	version.AuthorName("Rixu");
-	version.AuthorEmail("HelloWorld@gmail.com");
+	version.AuthorEmail("");
 	version.UsesAddressLibrary();
 	version.UsesUpdatedStructs();
 	version.CompatibleVersions({ SKSE::RUNTIME_SSE_1_6_1170 });
