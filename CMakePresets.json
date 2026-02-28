@@ -1,6 +1,7 @@
 {
     "version": 3,
-    "configurePresets": [
+    "configurePresets": 
+    [
         {
             "name": "base",
             "hidden": true,
