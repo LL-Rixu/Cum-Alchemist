@@ -20,6 +20,8 @@ void CumAlchemist::interface(SKSE::MessagingInterface::Message* message)
 
 CumAlchemist::CumAlchemist(): player(RE::PlayerCharacter::GetSingleton()) {}
 
+CumAlchemist::~CumAlchemist() { delete alchemist; }
+
 bool CumAlchemist::GetEffects(RE::CraftingSubMenus::AlchemyMenu* menu, std::map<RE::FormID, RE::Effect*>& effects)
 {
     uint8_t cum_count = 0;

@@ -27,5 +27,5 @@ public:
     void AddExp(RE::ActorValue, float);
 
     CumAlchemist();
-    ~CumAlchemist() = default;
+    ~CumAlchemist();
 };
