@@ -12,8 +12,9 @@ find_package(spdlog REQUIRED CONFIG)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SKYRIM_SUPPORT_AE ON CACHE BOOL "" FORCE)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL" CACHE BOOL "" FORCE)
 set(CMAKE_CXX_FLAGS "/EHsc /MP")
+set(CMAKE_STATIC_LINKER_FLAGS "/LTCG")
 
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /permissive- /Zc:preprocessor")
@@ -36,7 +37,8 @@ add_library(${PROJECT_NAME} SHARED 	"source/entry.cpp"
 									"source/perk.cpp"
 									"source/MCM.cpp"
 									"source/SkyUI.cpp"
-									"source/pages.cpp")
+									"source/pages.cpp"
+									)
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/PCH.h>")
 
