@@ -52,6 +52,12 @@ void Io::OnSave(void* data, size_t size)
     fclose(fd);
 }
 
+void Io::OnDelete(void* data, size_t size)
+{
+    std::string path = GetPath(data);
+    std::remove(path.c_str());
+}
+
 struct Potion
 {
     RE::FormID form;

@@ -12,7 +12,7 @@ void CumAlchemist::interface(SKSE::MessagingInterface::Message* message)
     case SKSE::MessagingInterface::kPreLoadGame: OnLoad(message->data, message->dataLen); break;
     case SKSE::MessagingInterface::kSaveGame: OnSave(message->data, message->dataLen); break;
     
-    case SKSE::MessagingInterface::kDeleteGame: /* TODO remove .potion file */ break;
+    case SKSE::MessagingInterface::kDeleteGame: OnDelete(message->data, message->dataLen); break;
 
     default: break;
     }

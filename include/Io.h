@@ -12,6 +12,7 @@ class Io
 public:
 	static void OnLoad(void*, size_t);
 	static void OnSave(void*, size_t);
+	static void OnDelete(void*, size_t);
 
     virtual void EventOnLoad(std::vector<uint8_t>&) = 0;
     virtual std::vector<uint8_t> EventOnSave() = 0;
