@@ -25,14 +25,14 @@ void Io::OnLoad(void* data, size_t size)
     if(!io) { return; }
 
     std::string path = GetPath(data);
-
     FILE* fd = fopen(path.c_str(), "rb");
-    if(fd == nullptr) { return; }
+    if(fd) { return; }
 
     std::vector<uint8_t> bytes;
     fseek(fd, 0, SEEK_END);
     bytes.resize(ftell(fd));
     fseek(fd, 0, SEEK_SET);
+
     fread(bytes.data(), 1, bytes.size(), fd);
     fclose(fd);
 
@@ -44,12 +44,10 @@ void Io::OnSave(void* data, size_t size)
     if(!io) { return; }
 
     std::string path = GetPath(data);
-
-    std::vector<uint8_t> bytes = io->EventOnSave();
-
     FILE* fd = fopen(path.c_str(), "wb");
     if(!fd) { return; }
 
+    std::vector<uint8_t> bytes = io->EventOnSave();
     fwrite(bytes.data(), 1, bytes.size(), fd);
     fclose(fd);
 }
