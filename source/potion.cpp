@@ -1,5 +1,4 @@
 #include <Potion.h>
-#include <Log.h>
 
 #define GetKeyword(x) kwpotion[x] = RE::TESForm::LookupByEditorID<RE::BGSKeyword>(_GetKeyword(#x).data())
 

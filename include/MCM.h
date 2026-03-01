@@ -1,6 +1,5 @@
 #pragma once
 #include <PCH.h>
-#include <Log.h>
 
 struct Option
 {

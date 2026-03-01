@@ -1,5 +1,4 @@
 #include <SkyUI.h>
-#include <Log.h>
 
 constexpr const char SkyUI::JOURNAL_MENU[] = "Journal Menu";
 constexpr const char SkyUI::MENU_ROOT[] = "_root.ConfigPanelFader.configPanel";

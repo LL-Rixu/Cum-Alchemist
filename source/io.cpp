@@ -1,5 +1,4 @@
 #include <Io.h>
-#include <Log.h>
 
 Io* Io::io = nullptr;
 std::string Io::directory = "Data\\CmAl\\";
