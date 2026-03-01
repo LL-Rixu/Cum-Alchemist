@@ -8,6 +8,8 @@ class Potion
     RE::TESDataHandler* datahandler;
     RE::ConcreteFormFactory<RE::AlchemyItem, RE::FormType::AlchemyItem>* factory;
 
+    std::vector<RE::EffectSetting*> effects[2];
+
     RE::BSFixedString GetName(const std::map<RE::FormID, RE::Effect*>&) const;
     float GetWeight(const std::map<RE::FormID, RE::Effect*>&) const;
     RE::AlchemyItem::AlchemyFlag GetFlags(const std::map<RE::FormID, RE::Effect*>&) const;
@@ -16,7 +18,7 @@ public:
     const RE::TESFile* esp;
     std::unordered_map<Key<RE::AlchemyItem*>, RE::AlchemyItem*> cache;
     std::vector<RE::AlchemyItem*> potions;
-    enum { Beneficial = 0, Harmful = 1 };
+    enum Type { Beneficial = 0, Harmful = 1 };
 
     struct Fortify
     {
@@ -59,7 +61,8 @@ public:
 
     Potion();
     ~Potion() = default;
-
+    
+    RE::EffectSetting* GetBonusEffect(Potion::Type type) { return effects[type].at(rand() % effects[type].size()); }
     RE::AlchemyItem* GetPotion(std::map<RE::FormID, RE::Effect*>&, RE::FormID);
 
     void ResetPotion();

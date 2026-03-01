@@ -138,7 +138,10 @@ bool CumAlchemist::GetEffects(RE::CraftingSubMenus::AlchemyMenu* menu, std::map<
 
     if((uint32_t)rand() > ((RAND_MAX * GetSkill(RE::ActorValue::kAlchemy)) / 100))
     {
-        // add bonus effect
+        RE::Effect* effect = new RE::Effect();
+        effect->baseEffect = GetBonusEffect(static_cast<Potion::Type>(!path));
+        effect->effectItem.duration = rand() % 180; // random duration between 0 and 3min
+        effect->effectItem.magnitude = static_cast<float>(rand() % 45) + 5.f; // random mag 5 and 50
     }
 
     return effects.size();

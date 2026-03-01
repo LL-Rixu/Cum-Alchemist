@@ -68,6 +68,18 @@ Potion::Potion(): factory(RE::IFormFactory::GetConcreteFormFactoryByType<RE::Alc
 
     datahandler = RE::TESDataHandler::GetSingleton();
     for(RE::AlchemyItem* potion : datahandler->GetFormArray<RE::AlchemyItem>()) { cache[potion] = potion; }
+
+    for(RE::EffectSetting* effect : datahandler->GetFormArray<RE::EffectSetting>())
+    {
+        // filter effects by beneficial and harmful
+        for(size_t i = 0; i < 2; ++i)
+        {
+            if(effect->HasKeyword(kwpotion[i]))
+            {
+                effects[i].push_back(effect);
+            }
+        }
+    }
 }
 
 static _forceinline const char* GetScale(const std::map<RE::FormID, RE::Effect*>& effects)
