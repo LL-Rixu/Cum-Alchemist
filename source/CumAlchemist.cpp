@@ -80,14 +80,16 @@ bool CumAlchemist::GetEffects(RE::CraftingSubMenus::AlchemyMenu* menu, std::map<
         effects[id] = element.first;
     }
     
-    path = path > 0;
+    path = path >= 0;
 
     std::vector<RE::FormID> erase;
     erase.reserve(12);
 
     for(auto& [id, effect] : effects)
     {
-        if(!(effect->baseEffect->HasKeyword(kwpotion[Beneficial]) - path))
+        const bool beneficial = effect->baseEffect->HasKeyword(kwpotion[Beneficial]);
+
+        if(beneficial != static_cast<bool>(path))
         {
             if(GetPerk(Perk::Purity) || ((uint32_t)rand() > ((RAND_MAX * GetSkill(RE::ActorValue::kAlchemy)) / 50)))
             {
@@ -96,7 +98,10 @@ bool CumAlchemist::GetEffects(RE::CraftingSubMenus::AlchemyMenu* menu, std::map<
         }
         else
         {
-            // https://en.uesp.net/wiki/Skyrim:Alchemy Physician buff here
+            if((beneficial && GetPerk(Perk::Physician)) || (!beneficial && GetPerk(Perk::Poisoner)))
+            {
+                effect->effectItem.magnitude *= 1.25f;
+            }
         }
     }
 
